@@ -1,0 +1,63 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6A7D2E34-3B5D-4A6D-9D3A-5C8E7F1B2046}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="SiservService.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SiservServiceUI.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="SiservServiceHost.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <PropertyGroup>
+        <DefaultProject>SiservServiceUI.dproj</DefaultProject>
+    </PropertyGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SiservService">
+        <MSBuild Projects="SiservService.dproj"/>
+    </Target>
+    <Target Name="SiservService:Clean">
+        <MSBuild Projects="SiservService.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SiservService:Make">
+        <MSBuild Projects="SiservService.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SiservServiceUI">
+        <MSBuild Projects="SiservServiceUI.dproj"/>
+    </Target>
+    <Target Name="SiservServiceUI:Clean">
+        <MSBuild Projects="SiservServiceUI.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SiservServiceUI:Make">
+        <MSBuild Projects="SiservServiceUI.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SiservServiceHost">
+        <MSBuild Projects="SiservServiceHost.dproj"/>
+    </Target>
+    <Target Name="SiservServiceHost:Clean">
+        <MSBuild Projects="SiservServiceHost.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SiservServiceHost:Make">
+        <MSBuild Projects="SiservServiceHost.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SiservService;SiservServiceHost;SiservServiceUI"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SiservService:Clean;SiservServiceHost:Clean;SiservServiceUI:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SiservService:Make;SiservServiceHost:Make;SiservServiceUI:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,2 @@
+object SiservWindowsService: TSiservWindowsService
+end
