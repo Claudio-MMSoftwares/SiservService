@@ -17,7 +17,6 @@ type
     procedure AdicionarLog(const APrefixo, ATexto: string);
     procedure CarregaCertificado(const HTTPReqResp: THTTPReqResp; Data: Pointer);
     function ValorTextoParaFloat(const AValor: string): Double;
-    function TipoCobrancaToAdiantamento(const ATipo: TipoDeCobranca): string;
   public
     constructor Create(AConexao: TIBCConnection; const AUsuario: string);
     destructor Destroy; override;
@@ -86,16 +85,6 @@ begin
   Result := StrToFloatDef(Texto, 0);
 end;
 
-function TServicoTAC.TipoCobrancaToAdiantamento(const ATipo: TipoDeCobranca): string;
-begin
-  if Ord(ATipo) = 1 then
-    Result := 'T'
-  else if Ord(ATipo) = 2 then
-    Result := 'F'
-  else
-    Result := '';
-end;
-
 procedure TServicoTAC.CarregaCertificado(const HTTPReqResp: THTTPReqResp;
   Data: Pointer);
 var
@@ -153,7 +142,7 @@ var
   Req: ObterTransacoesRequest;
   Res: ObterTransacoesResult;
   DataInicial, DataFinal, DataPagamento: TDateTime;
-  CNPJ, CIOT, TipoAdiantamento, ValorPago: string;
+  CNPJ, CIOT, ValorPago: string;
   CNPJMatriz: string;
   ValorPagoFloat: Double;
   I, NoTacPgto, ItemPgto, NoPg, NoParc, NoTipPag: Integer;
@@ -271,10 +260,12 @@ begin
           AdicionarLog('[MSG]', 'Transação ignorada por status não ativo.');
           Continue;
         end;
-        TipoAdiantamento := TipoCobrancaToAdiantamento(Transacoes[I].TipoDeCobranca);
-        if TipoAdiantamento = '' then
+        // Apenas adiantamentos são baixados automaticamente. Os demais tipos
+        // de cobrança continuam disponíveis no retorno da EFrete, mas não
+        // devem gerar baixa neste serviço.
+        if Ord(Transacoes[I].TipoDeCobranca) <> 1 then
         begin
-          AdicionarLog('[MSG]', 'Transação ativa sem conciliação automática.');
+          AdicionarLog('[MSG]', 'Transação ignorada: não é adiantamento.');
           Continue;
         end;
         if Assigned(Transacoes[I].ValorPago) then
@@ -294,12 +285,10 @@ begin
           ' inner join tabcli_tac_pgto pgto on pgto.notac = tac.notac ' +
           ' left join tabtippgtomot tipo on tipo.notippgtomot = pgto.notippgtomot ' +
           ' where tac.ciot = :ciot and pgto.noparc = :noparc ' +
-          '   and ((:adiant = ''T'' and tipo.adiant = ''T'') or ' +
-          '        (:adiant = ''F'' and (tipo.adiant = ''F'' or tipo.adiant is null))) ' +
+          '   and tipo.adiant = ''T'' ' +
           ' order by pgto.item';
         AuxQuery.ParamByName('CIOT').AsString := Transacoes[I].CIOT;
         AuxQuery.ParamByName('NOPARC').AsInteger := Transacoes[I].TransacaoDoCIOT;
-        AuxQuery.ParamByName('ADIANT').AsString := TipoAdiantamento;
         AuxQuery.Open;
         EncontrouParcela := not AuxQuery.IsEmpty;
         if not EncontrouParcela then
