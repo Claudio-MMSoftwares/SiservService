@@ -1,6 +1,6 @@
 # SiservService
 
-Grupo de projetos Delphi para consulta e baixa automática de títulos TAC EFrete/NSTech.
+Grupo de projetos Delphi para consulta e baixa automática de adiantamentos de títulos TAC EFrete/NSTech.
 
 - `SiservService.dproj`: DLL que executa o processo e exporta `ExecutarProcesso`.
 - `SiservServiceUI.dproj`: interface VCL com execução manual e timer.
